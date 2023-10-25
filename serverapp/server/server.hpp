@@ -1,3 +1,6 @@
+#ifndef BASIC_IMPORTS
+#define BASIC_IMPORTS
+
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ts/buffer.hpp>
@@ -8,8 +11,9 @@
 #include <vector>
 #include <thread>
 
+#endif
+
 class Server{
     void listen();
     int send();
-
 };

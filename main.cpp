@@ -1,7 +1,8 @@
-#include "client.cpp" // change import to hpp
-#include "server.cpp" // change import to hpp
+#include "serverapp/client/client.hpp"
+#include "serverapp/server/server.hpp"
 #include <memory>
 
+// Will change due to Qt
 
 int main(){
 
