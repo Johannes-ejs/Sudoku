@@ -29,7 +29,7 @@ def handle_client(conn: socket.socket, addr):
         if msg == DISCONNECT_MESSAGE:
             connected = False
             continue
-    pass
+        print(f"[{addr}] {msg}")
 
 def accept_clients(server: socket.socket):
     server.listen()
@@ -40,6 +40,7 @@ def accept_clients(server: socket.socket):
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
+    
 
 if __name__ == "__main__":
     main()

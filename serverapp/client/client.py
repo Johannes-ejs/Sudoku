@@ -35,3 +35,6 @@ def send(client: socket.socket, msg: str):
 
 def get_msg():
     return input()
+
+if __name__ == "__main__":
+    main()
