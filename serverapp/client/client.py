@@ -1,12 +1,17 @@
 import socket
 import sys
 import threading
+import pathlib
+import time
 
 SERVER = sys.argv[1]
 PORT = 5050
 ADDR = (SERVER, PORT)
 HEADER = 64 #!!!!!!!!!!!!!! TO CHANGE
 FORMAT = 'utf-8'
+TEMP_FILE_COM = ".transfer"
+TEMP_FILE_ENDGAME = ".endgame"
+TEMP_DIR = ".client"
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
 def main():
@@ -31,10 +36,25 @@ def send(client: socket.socket, msg: str):
     send_length += b' '*(HEADER - len(send_length))
     client.send(send_length)
     client.send(message)
-    print(client.recv(2048).decode(FORMAT))
+    handle(client.recv(2048).decode(FORMAT))
 
 def get_msg():
-    return input()
+    if not pathlib.Path(TEMP_DIR).exists():
+        pathlib.Path(TEMP_DIR).mkdir()
+    while not (path := (pathlib.Path(TEMP_DIR) / TEMP_FILE_COM)).exists():
+       time.sleep(0.1)
+    with path.open("r") as file:
+        msg = file.readline().strip()
+    path.unlink() 
+    return msg
+
+def handle(msg: str):
+    print(msg)
+    # if msg == "ENDGAME":
+    #     pathlib.Path(TEMP_DIR).mkdir()
+    #     with (pathlib.Path(TEMP_DIR) / TEMP_FILE_ENDGAME).open("w") as file:
+    #         file.write("ENDGAME")
+    #     sys.exit(0)
 
 if __name__ == "__main__":
     main()
