@@ -9,8 +9,7 @@ PORT = 5050
 ADDR = (SERVER, PORT)
 HEADER = 64 #!!!!!!!!!!!!!! TO CHANGE
 FORMAT = 'utf-8'
-TEMP_FILE_COM = ".transfer"
-TEMP_FILE_ENDGAME = ".endgame"
+TEMP_FILE_COM = "transfer"
 TEMP_DIR = ".client"
 DISCONNECT_MESSAGE = "!DISCONNECT"
 
