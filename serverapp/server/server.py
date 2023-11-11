@@ -1,3 +1,4 @@
+import pathlib
 import socket, sys, threading
 
 def get_local_ip():
@@ -13,8 +14,12 @@ MAX_NUM_PLAYERS = int(sys.argv[1]) # - 1 ????
 ADDR = (SERVER, PORT)
 HEADER = 64 #!!!!!!!!!!!!!! TO CHANGE
 FORMAT = 'utf-8'
+TEMP_DIR = ".server"
 TEMP_FILE_COM = ".transfer"
 TEMP_FILE_ENDGAME = ".endgame"
+TEMP_START_GAME = ".startgame"
+ROUND_OVER_MSG = "ENDROUND"
+ENDGAME_MSG = "ENDGAME"
 DISCONNECT_MESSAGE = "!DISCONNECT"
 BEGIN_GAME = False
 
@@ -43,29 +48,44 @@ def accept_clients(server: socket.socket):
     global BEGIN_GAME
     i = 0
     print(f"[LISTENING] Server is listening on {SERVER}")
+    threads, conns, addrs = [], [], []
     while i < MAX_NUM_PLAYERS:
         i+=1
         if start_game(): 
             BEGIN_GAME = True
             break
         conn, addr = server.accept()
+        conns.append(conn)
+        addrs.append(addr)
         thread = threading.Thread(target=handle_client, args=(conn, addr))
+        threads.append(thread)
         thread.start()
     
-    wait_for_finish()
+    wait_for_finish(threads, conns, addrs)
 
 def start_game(): #! CHANGE WHEN GM PRESSES "START" BUTTON
+    if (aux:=(pathlib.Path(TEMP_DIR)/TEMP_START_GAME)).exists():
+        aux.unlink()
+        return True
     return False
     
 def check_endgame(): #! CHECKS IF THE GAME HAS ENDED
+    return (pathlib.Path(TEMP_DIR) / TEMP_FILE_ENDGAME).exists()
+
+def broadcast_endgame(conns: list[socket.socket], addrs): #! SENDS ENDGAME MESSAGE TO ALL CLIENTS
+    with (pathlib.Path(TEMP_DIR) / TEMP_FILE_ENDGAME).open() as file:
+        msg = file.read()
+        if msg == ROUND_OVER_MSG:
+            pass
+        elif msg == ENDGAME_MSG:
+            pass
     pass
 
-def broadcast_endgame(conn: socket.socket, addr): #! SENDS ENDGAME MESSAGE TO ALL CLIENTS
-    conn.send("ENDGAME".encode(FORMAT))
-    pass
-
-def wait_for_finish(): #! WAITS FOR THE ENDGAME
-    pass
+def wait_for_finish(threads: list, conns: list, addrs: list): #! WAITS FOR THE ENDGAME
+    while True:
+        if check_endgame(): 
+            broadcast_endgame()
+            break
 
 if __name__ == "__main__":
     main()
