@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HomeGm</class>
+ <widget class="QDialog" name="HomeGm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>535</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Sudoku Warriors</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../Imagens/sudokuicon3.png</normaloff>../../Imagens/sudokuicon3.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: lightblue;</string>
+  </property>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>115</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>11</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Digite seu nome:</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="player_name">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>140</y>
+     <width>311</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>30</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>11</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Código da sala:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>205</y>
+     <width>261</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>11</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Número de jogadores: (&lt;8)</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="num_players">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>200</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="num_round">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>250</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>255</y>
+     <width>251</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>11</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Número de rodadas: </string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>300</y>
+     <width>251</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>11</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Tempo da rodada: (Segundos)</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="time">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>300</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="criarsala">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>440</y>
+     <width>161</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: gold; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+   <property name="text">
+    <string>CRIAR SALA</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="code">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>50</y>
+     <width>401</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Semilight</family>
+     <pointsize>27</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="level_0">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>370</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;
+</string>
+   </property>
+   <property name="text">
+    <string>Easy</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="level_1">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>370</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+   <property name="text">
+    <string>Medium</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="level_2">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>370</y>
+     <width>61</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: white; border: 1px solid black; border-radius: 5px;</string>
+   </property>
+   <property name="text">
+    <string>Hard</string>
+   </property>
+  </widget>
+  <zorder>label_2</zorder>
+  <zorder>player_name</zorder>
+  <zorder>label</zorder>
+  <zorder>label_3</zorder>
+  <zorder>num_players</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_5</zorder>
+  <zorder>time</zorder>
+  <zorder>num_round</zorder>
+  <zorder>criarsala</zorder>
+  <zorder>code</zorder>
+  <zorder>level_0</zorder>
+  <zorder>level_1</zorder>
+  <zorder>level_2</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
