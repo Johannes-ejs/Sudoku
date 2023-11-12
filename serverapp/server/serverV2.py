@@ -36,7 +36,7 @@ TEMP_FILE_COM = "transfer.txt"
 ROUND_OVER_MSG = "ENDROUND"
 ENDGAME_MSG = "ENDGAME"
 DISCONNECT_MESSAGE = "!DISCONNECT"
-ESCAPE_TOKEN = "/*"
+ESCAPE_TOKEN = "\n"
 NICKNAMES = {}
 NEXT_COUNT = 0
 POINTS = []
@@ -60,8 +60,8 @@ def accept_clients(server: socket.socket):
         conn, addr = server.accept()
         conns.append(conn)
         addrs.append(addr)
-        thread1 = threading.Thread(target=hear_client, args=(conn, addr))
-        thread2 = threading.Thread(target=broadcast, args=(conn, addr))
+        thread1 = threading.Thread(target=hear_client, args=(conn, addr, send_threads))
+        thread2 = threading.Thread(target=broadcast, args=(conn, addr, send_threads))
         recv_threads.append(thread1)
         send_threads.append(thread2)
         thread1.start()
@@ -77,43 +77,41 @@ def forced_start():
     if (aux:=(pathlib.Path(TEMP_DIR)/TEMP_FILE_COM)).exists():
         return True
 
-def operate_on_file(conn, addr):
-    if (aux := (pathlib.Path(TEMP_DIR)/TEMP_FILE_COM)).exists():
-        with aux.open() as file:
-            content = file.read()
-            match content.split(ESCAPE_TOKEN)[0]:
-                case _:
-                    raise ValueError("Unknown flag")
 
-def endgame(content: str, conns: list[socket.socket], addr):
+def endgame(content: str | bytes, conns: list[socket.socket], addr):
     ret = '1' in content
-
+    if ret:
+        with (pathlib.Path(TEMP_DIR) / TEMP_FILE_COM).open('w') as file:
+            file.write(content)
+    [conn.send(bytes(content)) for conn in conns]
     return ret
 
-def stop(content: str, conn: socket.socket, addr):
-    pass
+def stop(content: str | bytes, conn: socket.socket, addr, conns: list[socket.socket]):
+    endgame(content.replace(b"STOP", b"ENDGAME"), conns, addr)
 
-def begin(content: str, conns: list[socket.socket]):
+def begin(content: str | bytes, conns: list[socket.socket]):
     [conn.send(bytes(content)) for conn in conns]
 
-def config(content: str, conns: list[socket.socket]):
+def config(content: str | bytes, conns: list[socket.socket]):
     [conn.send(bytes(content)) for conn in conns]
 
-def points(content: str, conn: socket.socket, addr):
+def points(content: str | bytes, conn: socket.socket, addr, conns: list[socket.socket]):
     with threading.Lock() as lock:
-        POINTS.append((content.split(ESCAPE_TOKEN)[1], addr))
+        POINTS.append((content.split(ESCAPE_TOKEN)[1], NICKNAMES[addr]))
     time.sleep(1)
     rank(content, conn, addr)
     
-def next(content: str, conn: socket.socket, addr):
+def next(content: str | bytes, conn: socket.socket, addr, conns: list[socket.socket]):
     global NEXT_COUNT
     with threading.Lock() as lock:
         NEXT_COUNT += 1
     while NEXT_COUNT != MAX_NUM_PLAYERS:
         time.sleep(0.1)
-    ...
+    #!!!!!!!!! TEMP FILE MAY NOT EXIST HERE YET
+    with (pathlib.Path(TEMP_DIR) / TEMP_FILE_COM).open() as file:
+        config(bytes(file.read()), conns)
 
-def rank(content: bytes, conn: socket.socket, addr):
+def rank(content: str | bytes, conn: socket.socket, addr, conns: list[socket.socket]):
     with threading.Lock() as lock:
         POINTS.sort()
         POINTS.reverse()
@@ -121,29 +119,37 @@ def rank(content: bytes, conn: socket.socket, addr):
         conn.send(bytes(POINTS))
         POINTS.clear()
 
-
-def nickname(content: str, conn: socket.socket, addr):
+def nickname(content: str | bytes, conn: socket.socket, addr, conns: list[socket.socket]):
     with threading.Lock() as lock:
         NICKNAMES[addr] = content.split(ESCAPE_TOKEN)[1]
-    pass
 
-def hear_client(conn: socket.socket, addr):
+def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
     while True:
         content = conn.recv(HEADER).decode(FORMAT)
         match content.split(ESCAPE_TOKEN)[0]:
             case Flags.NEXT.value:
-                next(content, conn, addr)
+                next(content, conn, addr, conns)
             case Flags.POINTS.value:
-                points(content, conn, addr)
+                points(content, conn, addr, conns)
             case Flags.STOP.value:
-                stop(content, conn, addr)
+                stop(content, conn, addr, conns)
             case Flags.NICKNAME.value:
-                nickname(content, conn, addr)
+                nickname(content, conn, addr, conns)
+            case _:
+                raise ValueError("AAAAAAAAAAAAA")
 
-def broadcast():
-    pass
 
+def broadcast(conn: socket.socket, addr, conns: list[socket.socket]):
+    if (aux := (pathlib.Path(TEMP_DIR)/TEMP_FILE_COM)).exists():
+        with aux.open() as file:
+            content = file.read()
+            match content.split(ESCAPE_TOKEN)[0]:
+                case _:
+                    raise ValueError("Unknown flag")
+                
 def wait_endgame():
     while True:
         pass
     shutil.rmtree(pathlib.Path(TEMP_DIR))
+
+# BEGIN, CONFIG, POINTS, NEXT, RANK, NICKNAME
