@@ -52,7 +52,7 @@ def accept_clients(server: socket.socket):
     server.listen()
     i = 0
     print(f"[LISTENING] Server is listening on {SERVER}") #? Checks connectivity
-    recv_threads, send_threads, conns, addrs = [], [], [], []
+    threads, conns, addrs = [], [], []
     while i < MAX_NUM_PLAYERS:
         if forced_start():
             MAX_NUM_PLAYERS = i
@@ -60,16 +60,13 @@ def accept_clients(server: socket.socket):
         conn, addr = server.accept()
         conns.append(conn)
         addrs.append(addr)
-        thread1 = threading.Thread(target=hear_client, args=(conn, addr, send_threads))
-        thread2 = threading.Thread(target=broadcast, args=(conn, addr, send_threads))
-        recv_threads.append(thread1)
-        send_threads.append(thread2)
+        thread1 = threading.Thread(target=hear_client, args=(conn, addr, conns))
+        threads.append(thread1)
         thread1.start()
-        thread2.start()
         i+=1
     print("All clients connected")
     print("Game started")
-    wait_endgame()
+    wait_endgame(threads)
 
 def forced_start():
     if not (aux:=pathlib.Path(TEMP_DIR)).exists():
@@ -138,18 +135,10 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
             case _:
                 raise ValueError("AAAAAAAAAAAAA")
 
-
-def broadcast(conn: socket.socket, addr, conns: list[socket.socket]):
-    if (aux := (pathlib.Path(TEMP_DIR)/TEMP_FILE_COM)).exists():
-        with aux.open() as file:
-            content = file.read()
-            match content.split(ESCAPE_TOKEN)[0]:
-                case _:
-                    raise ValueError("Unknown flag")
-                
-def wait_endgame():
+def wait_endgame(threads: list[threading.Thread]):
     while True:
+        time.sleep(1)
+        if all(not thread.is_alive() for thread in threads):
+            break
         pass
     shutil.rmtree(pathlib.Path(TEMP_DIR))
-
-# BEGIN, CONFIG, POINTS, NEXT, RANK, NICKNAME
