@@ -44,6 +44,8 @@ def receive_message(client):
             print(msg)
             msgs = msg.split(ESCAPE_TOKEN)
             match(msgs[0]):
+                case '<CONFIG>':
+                    pass
                 case '<BEGIN>':
                     pass
                 case '<RANK>':
