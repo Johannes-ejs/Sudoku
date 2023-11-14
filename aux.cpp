@@ -16,13 +16,13 @@ bool exists(fs::path Path){
 }
 
 string read_file(fs::path Path){
-    ifstream inputFile(filePath);
+    ifstream inputFile(Path);
     string ret;
 
     if (inputFile.is_open()){
         string line;
         while (getline(inputFile, line)){
-            res + line + '\n';
+            ret += line + '\n';
         }
         inputFile.close();
         fs::remove(Path);
@@ -30,14 +30,14 @@ string read_file(fs::path Path){
     else{
         cerr << "Unable to open file for reading." << endl;
     }
-    return res;
+    return ret;
 }
 
 void write_file(fs::path Path, string msg){
-    ofstream inputFile(filePath);
+    ofstream inputFile(Path);
 
     if (inputFile.is_open()){
-        inputFile.write(msg);
+        inputFile << msg;
         inputFile.close();
     }
     else{
