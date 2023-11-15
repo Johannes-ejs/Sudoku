@@ -94,7 +94,7 @@ def forced_start(conns):
     
 def broadcast_players(conns: list[socket.socket]):
     global NICKNAMES, ESCAPE_TOKEN
-    [conn.send(bytes(ESCAPE_TOKEN.join(NICKNAMES.values()), FORMAT)) for conn in conns]
+    [conn.send(bytes("<LIST>" + ESCAPE_TOKEN, FORMAT)+ bytes(ESCAPE_TOKEN.join(NICKNAMES.values()), FORMAT)) for conn in conns]
 
 def endgame(content: str, conns: list[socket.socket], addr):
     [conn.send(bytes(content, FORMAT)) for conn in conns]
