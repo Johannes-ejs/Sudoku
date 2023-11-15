@@ -120,8 +120,8 @@ class AlgumaCoisa {
         return exec(string("python serverapp")+ POSIX_CHAR +"server"+ POSIX_CHAR +"get_ip.py");
     }
 
-    string join(string nickname){
-        return exec(string("python serverapp")+ POSIX_CHAR +"client"+ POSIX_CHAR +"clientV2.py" + " " + nickname);
+    string join(string nickname, string ip){
+        return exec(string("python serverapp") + POSIX_CHAR + "client" + POSIX_CHAR + "clientV2.py" + " " + ip + " " + nickname);
     }
 
     string create(int max_num){
