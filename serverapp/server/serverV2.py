@@ -71,9 +71,11 @@ def accept_clients(server: socket.socket):
                 target=hear_client, args=(conn, addr, conns))
             threads.append(thread1)
             thread1.start()
+            time.sleep(0.5)
+            broadcast_players(conns)
             i += 1
 
-        if forced_start():  # Check if the forced_start condition is met
+        if forced_start(conns):  # Check if the forced_start condition is met
             MAX_NUM_PLAYERS = i
             break
     print("All clients connected")
@@ -81,21 +83,21 @@ def accept_clients(server: socket.socket):
     print("Game started")
     wait_endgame(threads)
 
-def forced_start():
+def forced_start(conns):
     global TEMP_DIR, CPP_TO_PYTHON
     if not (aux:=pathlib.Path(TEMP_DIR)).exists():
         aux.mkdir()
     if (aux:=(pathlib.Path(TEMP_DIR)/CPP_TO_PYTHON)).exists():
+        with aux.open() as file:
+            config(file.read(), conns)
         return True
+    
+def broadcast_players(conns: list[socket.socket]):
+    global NICKNAMES, ESCAPE_TOKEN
+    [conn.send(bytes(ESCAPE_TOKEN.join(NICKNAMES.values()), FORMAT)) for conn in conns]
 
 def endgame(content: str, conns: list[socket.socket], addr):
-    global TEMP_DIR, PYTHON_TO_CPP
-    ret = '1' in content
-    if ret:
-        with (pathlib.Path(TEMP_DIR) / PYTHON_TO_CPP).open('w') as file:
-            file.write(content)
     [conn.send(bytes(content, FORMAT)) for conn in conns]
-    return ret
 
 def stop(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
     endgame(content.replace("STOP", "ENDGAME"), conns, addr)
