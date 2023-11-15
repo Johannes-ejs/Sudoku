@@ -35,6 +35,10 @@ class AlgumaCoisa {
         // TODO: PREENCHER QVECTOR DE RANKING NO C++ 
     }
 
+    void list(){
+        // TODO: 
+    }
+
     public:
 
     fs::path get_path()
@@ -51,7 +55,7 @@ class AlgumaCoisa {
     {
         ifstream inputFile(get_path());
         vector<string> ret;
-
+        while(!exists()){}
         if (inputFile.is_open())
         {
             string line;
@@ -72,6 +76,9 @@ class AlgumaCoisa {
             endgame();
         else if (ret[0] == "<RANK>")
             rank();
+        else{
+            list();
+        }
         return ret;
     }
 
@@ -120,7 +127,7 @@ class AlgumaCoisa {
         return exec(string("python serverapp")+ POSIX_CHAR +"server"+ POSIX_CHAR +"get_ip.py");
     }
 
-    string join(string nickname, string ip){
+    string join(string ip, string nickname){
         return exec(string("python serverapp") + POSIX_CHAR + "client" + POSIX_CHAR + "clientV2.py" + " " + ip + " " + nickname);
     }
 

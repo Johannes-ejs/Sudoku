@@ -17,6 +17,7 @@ class Flags(Enum):
     NEXT = "<NEXT>"
     RANK = "<RANK>"
     NICKNAME = "<NICKNAME>"
+    DISCONNECT = "<DISCONNECT>"
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -36,7 +37,6 @@ CPP_TO_PYTHON = "cpp_to_python.txt"
 PYTHON_TO_CPP = "python_to_cpp.txt"
 ROUND_OVER_MSG = "ENDROUND"
 ENDGAME_MSG = "ENDGAME"
-DISCONNECT_MESSAGE = "!DISCONNECT"
 ESCAPE_TOKEN = "\n"
 NICKNAMES = {}
 NEXT_COUNT = 0
@@ -160,10 +160,18 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
             case _:
                 print(f"Unrecognized flag: {content}")
 
-def wait_endgame(threads: list[threading.Thread]):
+def chacina(conns: list[socket.socket]):
+    [conn.send(bytes(Flags.DISCONNECT.value, FORMAT)) for conn in conns]
+
+def wait_endgame(threads: list[threading.Thread], conns: list[socket.socket]):
     global TEMP_DIR
     while True:
         time.sleep(1)
+        if (aux :=(pathlib.Path(TEMP_DIR) / CPP_TO_PYTHON)).exists():
+            with aux.open() as file:
+                if file.read().startswith(Flags.DISCONNECT.value):
+                    chacina(conns)
+                    aux.unlink()
         if all(not thread.is_alive() for thread in threads):
             break
         pass
