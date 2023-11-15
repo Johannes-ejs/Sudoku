@@ -1,4 +1,4 @@
-# Sudoku Wars
+# Sudoku Warriors
 
 Multiplayer sudoku game where the fastest wins 
 
