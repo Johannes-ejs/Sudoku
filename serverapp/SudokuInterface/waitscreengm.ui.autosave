@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>389</width>
-    <height>484</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>290</y>
-     <width>381</width>
+     <y>370</y>
+     <width>391</width>
      <height>21</height>
     </rect>
    </property>
@@ -91,8 +91,8 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>390</y>
+     <x>140</x>
+     <y>470</y>
      <width>121</width>
      <height>51</height>
     </rect>
@@ -112,8 +112,8 @@
   <widget class="QLabel" name="num_atual_players_2">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>330</y>
+     <x>120</x>
+     <y>410</y>
      <width>161</width>
      <height>41</height>
     </rect>
@@ -128,6 +128,32 @@
    </property>
    <property name="text">
     <string>1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>270</y>
+     <width>401</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>SimSun-ExtB</family>
+     <pointsize>17</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: white;</string>
+   </property>
+   <property name="text">
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>

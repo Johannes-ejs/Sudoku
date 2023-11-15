@@ -22,6 +22,7 @@ public:
     Game(const Game& outro);
     Game();
     int play(int num_player, int i, int j,int x);
+    int solution_value(int i,int j);
     //uma função para pegar os valores da matriz
     int initial_data_value(int num_player,int i, int j);
     ~Game();

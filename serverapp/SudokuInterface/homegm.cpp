@@ -2,6 +2,11 @@
 #include "ui_homegm.h"
 #include "waitscreengm.h"
 #include <time.h>
+#include <QVector>
+#include <QString>
+#include <map>
+
+using namespace std;
 
 
 HomeGm::HomeGm(QWidget *parent) :
@@ -25,18 +30,22 @@ void HomeGm::on_criarsala_clicked()
     QString num_round=ui->num_round->toPlainText();
     QString player_name=(ui->player_name->toPlainText());
     QString time=ui->time->toPlainText();
+    QVector<pair<QString,int>> ranking;
+    ranking.push_back({player_name,0});
 
 //    create_game(A);
     //interessante: definir aqui a matriz!!!
 //    MainWindow *w=new(MainWindow(num_players,num_round,player_name,time,code));
     if(num_players!=QString("") && num_round!=QString("") && player_name!=QString("") && time!=QString("") && num_players.toInt()<=7 && level_select){
-        WaitScreenGm *w=new WaitScreenGm(num_players.toInt(),num_round.toInt(),0,player_name,time.toInt(),code,level);
+        //já passa o vetor mais vazio nesse caso
+        WaitScreenGm *w=new WaitScreenGm(ranking,num_players.toInt(),num_round.toInt(),1,time.toInt(),code,level);
         w->show();
         close();
     }
 }
 
 void HomeGm::generate_code(){
+    //#função que puxa o code = IP#
     srand(time(nullptr));
     code=rand()%(9000)+1000;
 }

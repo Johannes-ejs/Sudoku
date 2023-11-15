@@ -33,6 +33,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         waitscreengm.h waitscreengm.cpp waitscreengm.ui
         game.cpp
         game.h
+        endgame.h endgame.cpp endgame.ui
+
 
     )
 # Define target properties for Android with Qt 6 as:

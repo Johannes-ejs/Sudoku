@@ -31,7 +31,7 @@ int HomeClient::initial_conection(){
     //if retorno é 1 encontrou o servidor e conectou
     //if retorno é 2 encontrou e não conseguiu conectar
     if(1){
-        WaitScreen *w=new WaitScreen(0,player_name,code.toInt());
+        WaitScreen *w=new WaitScreen(3,1,player_name,code.toInt());
         w->show();
         close();
     }

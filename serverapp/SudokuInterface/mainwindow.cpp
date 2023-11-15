@@ -2,10 +2,25 @@
 #include "./ui_mainwindow.h"
 #include <QDateTime>
 
-MainWindow::MainWindow(int (&game_data)[9][9],int num_players, int num_round,int num_round_now, QString player_name, int time, int level, int num_player, Game game,QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow),num_players(num_players),num_round(num_round),num_round_now(num_round_now),player_name(player_name),time(time),level(level),num_player(num_player),game(game),pontuation(0)
+MainWindow::MainWindow(int (&game_data)[9][9], int (&solution_data)[9][9], int num_round,int num_round_now, QString player_name,int time, bool is_GM, int level,int num_players, int code, QVector<pair<QString,int>> ranking, Game game,QWidget *parent)
+    : QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    num_round(num_round),
+    num_round_now(num_round_now),
+    player_name(player_name),
+    time(time),
+    is_GM(is_GM),
+    level(level),
+    num_players(num_players),
+    code(code),
+    ranking(ranking),
+    pontuation(0)
 {
+    num_player=0;
+
+    qDebug()<<"iin11";
     for(int m=0;m<9;m++) for(int l=0;l<9;l++) data[m][l]=game_data[m][l];
+    for(int m=0;m<9;m++) for(int l=0;l<9;l++) solution[m][l]=solution_data[m][l];
     ui->setupUi(this);
     for(int i=0;i<9;i++){
         for (int j = 0; j < 9; j++) {
@@ -53,6 +68,7 @@ MainWindow::MainWindow(int (&game_data)[9][9],int num_players, int num_round,int
     }
     tempo = new QTimer(this);
     connect(tempo,SIGNAL(timeout()),this,SLOT(new_time()));
+    endTime = QTime::currentTime().addSecs(time);
     tempo->start(1000);
 }
 
@@ -138,7 +154,8 @@ void MainWindow::enter_select()
     QString num_of_box = buttons[i][j]->text();
     if(select && num_of_box!=QString("")){
         if(!client){
-            if((game.play(num_player,i,j,num_of_box.toInt()))==0){
+            int num_play=play(i,j,num_of_box.toInt());
+            if(num_play==0){
                 pontuation-=10;
                 ui->pontuation->setText(QString::number(pontuation));
                 select=false;
@@ -146,27 +163,7 @@ void MainWindow::enter_select()
                 red=true;
                 return;
             }
-            if((game.play(num_player,i,j,num_of_box.toInt()))==2){
-                finished();
-                call_rank();
-
-            }
-            buttons[i][j]->setStyleSheet("QPushButton { background-color: white; border: 1px solid gray; border-radius: 5px; color: black; }");
-            select=false;
-            data[i][j]=num_of_box.toInt();
-            pontuation+=10;
-            ui->pontuation->setText(QString::number(pontuation));
-        }
-        else{
-            if((client_play(i,j,num_of_box.toInt()))==0){
-                pontuation-=10;
-                ui->pontuation->setText(QString::number(pontuation));
-                select=false;
-                buttons[i][j]->setStyleSheet("QPushButton { background-color: red; border: 1px solid gray; border-radius: 5px; color: black; }");
-                red=true;
-                return;
-            }
-            if((client_play(i,j,num_of_box.toInt()))==2){
+            if(num_play==2){
                 finished();
                 call_rank();
 
@@ -180,24 +177,35 @@ void MainWindow::enter_select()
     }
 }
 
-int MainWindow::client_play(int i, int j, int x){
-    //nessa função ele pergunta para o servidor se data[num_player][i][j]==x e se o jogo acabou
-}
+void MainWindow::finished(){
+    //#nessa função ele envia para o servidor  a informação de que ele acabou
 
-void MainWindow:: finished(){
-    //nessa função ele declara que ele venceu o jogo enviando esse sinal para o servidor
-    //nessa função ele preenche o vector ranking
+    //fica travado no get_rank até obter o rank
+    get_rank();
 }
 
 void MainWindow::is_finished(){
-    //nessa função ele verifica se finalizou o jogo com o servido
+    //#nessa função ele verifica se finalizou o jogo com o servidor (recebe a informação de termino com o servidor)
+    //caso tenha finalizado ele envia para o servidor a sua pontuação
+}
+
+void MainWindow::finished_time(){
+    //função evocada quando acaba o tempo, envia a pontuação para o servidor
+    get_rank();
+}
+
+void MainWindow::get_rank(){
+    ranking[0].second=pontuation;
+    //função evocada ao se finalizar a rodada para obter o ranking geral do servidor para a próxima tela
 }
 
 void MainWindow::new_time(){
-    static QTime endTime = QTime::currentTime().addSecs(time); // 3 minutos a partir do tempo atual
+     // 3 minutos a partir do tempo atual
     QTime currentTime = QTime::currentTime();
     int remainingSeconds = currentTime.secsTo(endTime);
     if (remainingSeconds <= 0) {
+        finished_time();
+        qDebug()<<11;
         call_rank();
 
     } else {
@@ -220,9 +228,24 @@ void MainWindow::modify_collor(int value,bool white){
 }
 
 void MainWindow:: call_rank(){
-    Rank *w=new Rank(ranking,num_round,num_round_now);
+    Rank *w=new Rank(ranking,num_round,num_round_now,is_GM, time, level,code,player_name);
     w->show();
     tempo->stop();
     close();
+}
+
+int MainWindow::play(int m,int n, int x){
+    if(solution[m][n]!=x)return 0;
+    else{
+        data[m][n]=x;
+        for(int l=0;l<9;l++){
+            for(int p=0;p<9;p++){
+                if(data[l][p]==0){
+                    return 1;
+                }
+            }
+        }
+        return 2;
+    }
 }
 
