@@ -4,26 +4,31 @@
 #include <QDebug>
 
 using namespace std;
-
-WaitScreenGm::WaitScreenGm(int num_players,int num_round,int num_round_now,QString player_name,int time,int code,int level,QWidget *parent) :
+//passar o QVector -> num_players player_name junto, time
+WaitScreenGm::WaitScreenGm(QVector<pair<QString,int>> ranking,int num_players,int num_round, int num_round_now,int time,int code ,int level,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::WaitScreenGm),
+    ranking(ranking),
     num_players(num_players),
     num_round(num_round),
     num_round_now(num_round_now),
-    player_name(player_name),
+    player_name(ranking[0].first),
     time(time),
     code(code),
     level(level),
-    num_player(0),
     game(level,num_players),
     num_players_now(1)
 {
-    for(int i=0;i<9;i++) for(int j=0;j<9;j++) game_data[i][j]=game.initial_data_value(num_player,i,j);
+    qDebug("aaaa3");
+    // #ele não vai mais passar game e sim soluction
+    for(int i=0;i<9;i++) for(int j=0;j<9;j++) game_data[i][j]=game.initial_data_value(0,i,j);
+    for(int i=0;i<9;i++) for(int j=0;j<9;j++) solution_data[i][j]=game.solution_value(i,j);
+    //# colocar para pegar a solução #
     tempo = new QTimer(this);
     connect(tempo,SIGNAL(timeout()),this,SLOT(new_time()));
     tempo->start(600);
     ui->setupUi(this);
+    ui->label_2->setText(QString::number(code));
     //create_game();
     //dentro da função que muda os pontinhos ele aceita solicitação de outros e envia a matriz e os dados
 }
@@ -36,7 +41,7 @@ WaitScreenGm::~WaitScreenGm()
 void WaitScreenGm::on_pushButton_clicked()
 {
     num_players=num_players_now;
-    MainWindow *w=new MainWindow(game_data,num_players,num_round,num_round_now,player_name,time,level,num_player,game);
+    MainWindow *w=new MainWindow(game_data,solution_data,num_round,num_round_now,player_name,time,true,level,num_players,code,ranking,game);
     w->show();
     tempo->stop();
     close();
@@ -72,4 +77,4 @@ void WaitScreenGm:: new_time(){
     }
     ui->num_atual_players_2->setText(QString::number(num_players_now));
 }
-
+//nessa tela ele precisa aceitar comunicação com clientes adicionando o nome deles ao QVector

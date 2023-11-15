@@ -50,7 +50,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Digite o código da sala:</string>
+    <string>Digite o IP do servidor:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">

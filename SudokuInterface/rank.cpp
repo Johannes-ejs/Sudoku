@@ -1,12 +1,24 @@
 #include "rank.h"
 #include "ui_rank.h"
+#include "endgame.h"
+#include "waitscreengm.h"
+#include "waitscreen.h"
+#include <QVector>
+#include <QString>
+#include <map>
+#include <QDebug>
 
-Rank::Rank (QVector<pair<QString,int>> rank,int num_round, int num_round_now, QWidget *parent) :
+Rank::Rank (QVector<pair<QString,int>> ranking,int num_round, int num_round_now, bool is_GM, int time,int level,int code, QString player_name, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Rank),
-    ranking(),
+    ranking(ranking),
     num_round(num_round),
-    num_round_now(num_round_now)
+    num_round_now(num_round_now),
+    is_GM(is_GM),
+    time(time),
+    level(level),
+    code(code),
+    player_name(player_name)
 {
 //    for (int i = 0; i < 7; i++) {
 //        players[i] = nullptr;
@@ -42,3 +54,29 @@ Rank::~Rank()
 {
     delete ui;
 }
+
+void Rank::on_continue_2_clicked()
+{
+    if(num_round_now==num_round){
+        EndGame *endgame=new(EndGame);
+        endgame->show();
+        close();
+    }
+    else{
+        num_round_now++;
+        qDebug("aaaa1");
+        if(is_GM){
+            qDebug()<<ranking.size();
+            WaitScreenGm *waitGM = new WaitScreenGm(ranking,ranking.size(),num_round,num_round_now,time,code,level);
+            waitGM->show();
+            close();
+        }
+        else{
+            WaitScreen *wait = new WaitScreen(num_round,num_round_now,player_name,code);
+            wait->show();
+            close();
+        }
+    }
+
+}
+

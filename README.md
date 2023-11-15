@@ -1,12 +1,10 @@
-# Sudoku Wars
+# Sudoku Warriors
 
 Multiplayer sudoku game where the fastest wins 
 
 ## How to play:
 
-### Install requirements
-
-First, you must install vcpkg (for standardization reasons). [Here is the link on how to install it](https://vcpkg.io/en/getting-started)
+First, you must [install QtCreator](https://www.qt.io/product/development-tools). 
 
 Then, git clone this project:
 
@@ -14,10 +12,4 @@ Then, git clone this project:
     git clone https://github.com/Johannes-ejs/Sudoku
 ```
 
-Finally, install the required packages:
-
-```shell
-    vcpkg install boost-beast
-```
-
-Now you can compile and run main.cpp
+Finally, open it in QtCreator and run it.

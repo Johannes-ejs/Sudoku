@@ -143,6 +143,10 @@ int Game:: play (int num_player, int i, int j,int x){
     }
 }
 
+int Game::solution_value(int i,int j){
+    return soluction[i][j];
+}
+
 int Game::initial_data_value (int num_player,int i, int j) {
     return data_game[num_player][i][j];
 }
