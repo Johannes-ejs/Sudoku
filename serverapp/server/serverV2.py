@@ -32,7 +32,8 @@ ADDR = (SERVER, PORT)
 HEADER = 64
 FORMAT ='utf-8'
 TEMP_DIR = ".server"
-TEMP_FILE_COM = "transfer.txt"
+CPP_TO_PYTHON = "cpp_to_python.txt"
+PYTHON_TO_CPP = "python_to_cpp.txt"
 ROUND_OVER_MSG = "ENDROUND"
 ENDGAME_MSG = "ENDGAME"
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -81,17 +82,17 @@ def accept_clients(server: socket.socket):
     wait_endgame(threads)
 
 def forced_start():
-    global TEMP_DIR, TEMP_FILE_COM
+    global TEMP_DIR, CPP_TO_PYTHON
     if not (aux:=pathlib.Path(TEMP_DIR)).exists():
         aux.mkdir()
-    if (aux:=(pathlib.Path(TEMP_DIR)/TEMP_FILE_COM)).exists():
+    if (aux:=(pathlib.Path(TEMP_DIR)/CPP_TO_PYTHON)).exists():
         return True
 
 def endgame(content: str, conns: list[socket.socket], addr):
-    global TEMP_DIR, TEMP_FILE_COM
+    global TEMP_DIR, PYTHON_TO_CPP
     ret = '1' in content
     if ret:
-        with (pathlib.Path(TEMP_DIR) / TEMP_FILE_COM).open('w') as file:
+        with (pathlib.Path(TEMP_DIR) / PYTHON_TO_CPP).open('w') as file:
             file.write(content)
     [conn.send(bytes(content, FORMAT)) for conn in conns]
     return ret
@@ -119,9 +120,10 @@ def next(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
     while NEXT_COUNT != MAX_NUM_PLAYERS:
         time.sleep(0.1)
     while True:
-        if (aux :=(pathlib.Path(TEMP_DIR) / TEMP_FILE_COM)).exists():
+        if (aux :=(pathlib.Path(TEMP_DIR) / CPP_TO_PYTHON)).exists():
             with aux.open() as file:
                 config(bytes(file.read(), FORMAT), conns)
+            aux.unlink()
             break
         time.sleep(0.1)
 
@@ -155,8 +157,6 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
                 nickname(content, conn, addr, conns)
             case _:
                 print(f"Unrecognized flag: {content}")
-        if (aux :=(pathlib.Path(TEMP_DIR) / TEMP_FILE_COM)).exists():
-            aux.unlink()
 
 def wait_endgame(threads: list[threading.Thread]):
     global TEMP_DIR
