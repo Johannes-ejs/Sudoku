@@ -29,7 +29,7 @@ def get_local_ip():
 
 SERVER = get_local_ip()
 PORT = 5050
-MAX_NUM_PLAYERS
+MAX_NUM_PLAYERS = 1
 ADDR = (SERVER, PORT)
 HEADER = 64
 FORMAT ='utf-8'
@@ -71,9 +71,9 @@ def main():
     subprocess.run("g++ sudoku.cpp -o sudoku", shell=True)
     out: str
     try:
-        out = subprocess.run(".\\sudoku", shell=True, capture_output=True).stdout.decode("utf-8")
+        out = subprocess.run(f".\\sudoku {diff}", shell=True, capture_output=True).stdout.decode("utf-8")
     except Exception:
-        out = subprocess.run("./sudoku", shell=True, capture_output=True).stdout.decode("utf-8")
+        out = subprocess.run(f"./sudoku {diff}", shell=True, capture_output=True).stdout.decode("utf-8")
 
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

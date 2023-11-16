@@ -1,6 +1,4 @@
 #include "game.h"
-#include <QDebug>
-#include <memory>
 
 using namespace std;
 
@@ -249,15 +247,16 @@ bool Game::next(int &x, int &y, int (&M)[9][9])
 
 int main(int argc, char **argv)
 {
-    Game jogo(argv[0], 1);
-    for (int k = 0; k < 2; k++)
-    {
-        for (int i = 0; i < 9; i++)
-            for (int j = 0; j < 9; j++)
+    Game jogo((int)argv[1], 1);
+    for (int k = 0; k < 2; k++){
+        for (int i = 0; i < 9; i++){
+            for (int j = 0; j < 9; j++){
                 if (k == 0)
-                    cout << jogo.initial_data_value(1, i, j);
+                    cout << jogo.initial_data_value(0, i, j);
                 else
                     cout << jogo.solution_value(i, j);
+            }
+        }
         cout << endl;
     }
     return 0;

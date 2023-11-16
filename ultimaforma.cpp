@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <array>
+#include "sudoku.cpp"
 
 #ifdef _WIN32
 char POSIX_CHAR = '\\';
