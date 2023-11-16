@@ -6,7 +6,8 @@ import threading
 import shutil
 from enum import Enum
 import select
-
+import subprocess
+import argparse
 
 class Flags(Enum):
     ENDGAME = "<ENDGAME>"
@@ -28,7 +29,7 @@ def get_local_ip():
 
 SERVER = get_local_ip()
 PORT = 5050
-MAX_NUM_PLAYERS = int(sys.argv[1])
+MAX_NUM_PLAYERS
 ADDR = (SERVER, PORT)
 HEADER = 64
 FORMAT ='utf-8'
@@ -43,7 +44,37 @@ NEXT_COUNT = 0
 POINTS = []
 
 
+def is_socket_closed(sock):
+    try:
+        error_code = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+        return False
+    except socket.error as e:
+        if e.errno == 10054:
+            return True
+        else:
+            raise e
+
+
+socket.socket.__bool__ = is_socket_closed
+
+def parse_args():
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("-n", "--num_players", type=int, default=1)
+    argparser.add_argument("-d", "--difficulty", type=int, default=1)
+    return argparser.parse_args()
+
 def main():
+    global MAX_NUM_PLAYERS
+    args = parse_args()
+    MAX_NUM_PLAYERS = args.num_players
+    diff = args.difficulty
+    subprocess.run("g++ sudoku.cpp -o sudoku", shell=True)
+    out: str
+    try:
+        out = subprocess.run(".\\sudoku", shell=True, capture_output=True).stdout.decode("utf-8")
+    except Exception:
+        out = subprocess.run("./sudoku", shell=True, capture_output=True).stdout.decode("utf-8")
+
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind(ADDR)
@@ -72,12 +103,12 @@ def accept_clients(server: socket.socket):
             threads.append(thread1)
             thread1.start()
             time.sleep(0.5)
-            broadcast_players(conns)
             i += 1
 
         if forced_start(conns):  # Check if the forced_start condition is met
             MAX_NUM_PLAYERS = i
             break
+
     print("All clients connected")
     time.sleep(0.2)
     print("Game started")
@@ -100,7 +131,8 @@ def endgame(content: str, conns: list[socket.socket], addr):
     [conn.send(bytes(content, FORMAT)) for conn in conns]
 
 def stop(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    endgame(content.replace("STOP", "ENDGAME"), conns, addr)
+    kill_conns(conns)
+    # endgame(content.replace("STOP", "ENDGAME"), conns, addr)
 
 def begin(content: str, conns: list[socket.socket]):
     [conn.send(bytes(content, FORMAT)) for conn in conns]
@@ -160,21 +192,16 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
             case _:
                 print(f"Unrecognized flag: {content}")
 
-def chacina(conns: list[socket.socket]):
-    [conn.send(bytes(Flags.DISCONNECT.value, FORMAT)) for conn in conns]
+def kill_conns(conns: list[socket.socket]):
+    [conn.close() for conn in conns]
+    # [conn.send(bytes(Flags.DISCONNECT.value, FORMAT)) for conn in conns]
 
 def wait_endgame(threads: list[threading.Thread], conns: list[socket.socket]):
     global TEMP_DIR
     while True:
         time.sleep(1)
-        if (aux :=(pathlib.Path(TEMP_DIR) / CPP_TO_PYTHON)).exists():
-            with aux.open() as file:
-                if file.read().startswith(Flags.DISCONNECT.value):
-                    chacina(conns)
-                    aux.unlink()
-        if all(not thread.is_alive() for thread in threads):
+        if all(not conn for conn in conns):
             break
-        pass
     shutil.rmtree(pathlib.Path(TEMP_DIR))
 
 if __name__ == "__main__":

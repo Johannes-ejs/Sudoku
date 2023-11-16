@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -16,7 +15,6 @@ char POSIX_CHAR = '/';
 
 using namespace std;
 
-namespace fs=std::filesystem;
 
 class AlgumaCoisa {
     string dir;
@@ -27,33 +25,24 @@ class AlgumaCoisa {
         // TODO: RECEBE RODADAS, TEMPO, JOGO INCOMPLETO, SOLUCAO
     }
 
-    void endgame(){
-        // TODO: PARA O JOGO E MANDA <POINTS>  
-    }
-
     void rank(){
         // TODO: PREENCHER QVECTOR DE RANKING NO C++ 
     }
 
-    void list(){
-        // TODO: 
-    }
-
     public:
 
-    fs::path get_path()
-    {
-        return fs::path(dir).append(file);
+    bool exists(){
+        ifstream f(dir + POSIX_CHAR + file);
+        return f.good();
     }
 
-    bool exists()
-    {
-        return fs::exists(get_path());
+    void remove(string path){
+        system(string("rm " + path).c_str());
     }
 
     vector<string> read_file()
     {
-        ifstream inputFile(get_path());
+        ifstream inputFile(dir + POSIX_CHAR + file);
         vector<string> ret;
         while(!exists()){}
         if (inputFile.is_open())
@@ -64,7 +53,7 @@ class AlgumaCoisa {
                 ret.push_back(line);
             }
             inputFile.close();
-            fs::remove(get_path());
+            remove(dir + POSIX_CHAR + file);
         }
         else
         {
@@ -72,19 +61,14 @@ class AlgumaCoisa {
         }
         if (ret[0] == "<CONFIG>")
             config();
-        else if (ret[0] == "<ENDGAME>")
-            endgame();
         else if (ret[0] == "<RANK>")
             rank();
-        else{
-            list();
-        }
         return ret;
     }
 
     void write_file(string msg)
     {
-        ofstream inputFile(get_path());
+        ofstream inputFile(dir + POSIX_CHAR + file);
 
         if (inputFile.is_open())
         {
