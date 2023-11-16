@@ -108,10 +108,10 @@ class AlgumaCoisa {
         this->file = name;
     }
 
-    string exec(const char *cmd){
+    string exec(string cmd){
         array<char, 128> buffer;
         string result;
-        unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+        unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
         if (!pipe)
         {
             throw runtime_error("popen() failed!");
@@ -132,7 +132,7 @@ class AlgumaCoisa {
     }
 
     string create(int max_num){
-        return exec(string("python serverapp")+ POSIX_CHAR +"server"+ POSIX_CHAR +"serverV2.py" + " " + to_string(max_num));
+        return exec(string("python serverapp") + POSIX_CHAR + "server" + POSIX_CHAR + "serverV2.py" + " " + to_string(max_num));
     }
 
 };
