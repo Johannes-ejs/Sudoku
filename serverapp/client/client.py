@@ -18,12 +18,13 @@ TEMP_FILE_CPPTOPY = 'cpp_to_python.txt'
 
 
 def mkdir_client():
-    #Criar
+    '''Cria a pasta .client/ para amarzenar os arquivos python_to_cpp.txt e cpp_to_python.cpp'''
     if not (aux := pathlib.Path(TEMP_DIR)).exists():
         aux.mkdir()
 
 
 def rmdir_client(threads: list):
+    '''remove a pasta .client/ que armazenar os arquivos python_to_cpp.txt e cpp_to_python.cpp'''
     while True:
         time.sleep(1)
         if all(not thread.is_alive() for thread in threads):
@@ -46,7 +47,7 @@ def main():
     except:
         return print('\nNão foi possível conectar ao servidor...')
 
-    print(f'Conectado a {ip_server}...')
+    print(f'{nickname} conectado a {ip_server}...')
     mkdir_client()
 
     thread1 = Thread(target=receive_message, args=[client])
@@ -64,11 +65,8 @@ def main():
 
 
 def receive_message(client: socket.socket):
-    # MENSAGENS RECEBIDAS PELO SERVIDOR COM AS SEGUINTES FLAGS:
-    # <CONFIG>
-    # <BEGIN>
-    # <RANK>
-    # <ENDGAME>
+    '''MENSAGENS RECEBIDAS PELO SERVIDOR COM AS SEGUINTES FLAGS:
+    <CONFIG>'''
     
     while True:
         try:
@@ -77,23 +75,19 @@ def receive_message(client: socket.socket):
             write_to_file(msg)
             msgs = msg.split(ESCAPE_TOKEN)
             match(msgs[0]):
-                case '<DISCONNECT>':
-                    print('Fim de jogo. Encerrando conexão com o servidor...')
+                case '<CONFIG>':
                     client.close()
-                    break
+                    return
         except:
             print('Não foi possível continuar conectado...')
             input('Pressione <enter> para continuar...')
             client.close()
-            break
+            return
 
 
 def send_message(client: socket.socket):
-    # MENSAGENS ENVIADAS AO SERVIDOR COM AS SEGUINTES FLAGS:
-    # <STOP>
-    # <NEXT>
-    # <POINTS>
-    # <NICKNAME>
+    '''MENSAGENS ENVIADAS AO SERVIDOR COM AS SEGUINTES FLAGS:
+    <STOP>'''
 
     while True:
         try:
@@ -101,16 +95,6 @@ def send_message(client: socket.socket):
                 with (pathlib.Path(TEMP_DIR)/TEMP_FILE_CPPTOPY).open() as file:
                     msg = file.read()
                     client.send(f'{msg}'.encode(FORMAT))
-                    # msgs = msg.split(ESCAPE_TOKEN)
-                    # match(msgs[0]):
-                    #     case '<STOP>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}'.encode(FORMAT))
-                    #     case '<NEXT>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}'.encode(FORMAT))
-                    #     case '<POINTS>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}{get_points()}'.encode(FORMAT))
-                    #     case '<NICKNAME>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}{get_nickname()}'.encode(FORMAT))
                 (pathlib.Path(TEMP_DIR)/TEMP_FILE_CPPTOPY).unlink()
             else:
                 continue
