@@ -18,12 +18,13 @@ TEMP_FILE_CPPTOPY = 'cpp_to_python.txt'
 
 
 def mkdir_client():
-    #Criar
+    '''Cria a pasta .client/ para amarzenar os arquivos python_to_cpp.txt e cpp_to_python.cpp'''
     if not (aux := pathlib.Path(TEMP_DIR)).exists():
         aux.mkdir()
 
 
 def rmdir_client(threads: list):
+    '''remove a pasta .client/ que armazenar os arquivos python_to_cpp.txt e cpp_to_python.cpp'''
     while True:
         time.sleep(1)
         if all(not thread.is_alive() for thread in threads):
@@ -32,11 +33,13 @@ def rmdir_client(threads: list):
 
 
 def write_to_file(mensagem: str)->None:
+    '''Função que recebe uma mensagem do servidor e escreve no arquito python_to_cpp.txt'''
     with open(os.path.join(TEMP_DIR, TEMP_FILE_PYTOCPP), 'w') as f:
         f.write(mensagem)
 
 
 def main():
+    '''Função principal que roda na aplicação do lado do cliente.'''
     ip_server = sys.argv[1]
     nickname = sys.argv[2]
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,7 +49,7 @@ def main():
     except:
         return print('\nNão foi possível conectar ao servidor...')
 
-    print(f'Conectado a {ip_server}...')
+    print(f'{nickname} conectado a {ip_server}...')
     mkdir_client()
 
     thread1 = Thread(target=receive_message, args=[client])
@@ -64,11 +67,8 @@ def main():
 
 
 def receive_message(client: socket.socket):
-    # MENSAGENS RECEBIDAS PELO SERVIDOR COM AS SEGUINTES FLAGS:
-    # <CONFIG>
-    # <BEGIN>
-    # <RANK>
-    # <ENDGAME>
+    '''MENSAGENS RECEBIDAS PELO SERVIDOR COM AS SEGUINTES FLAGS:
+    <CONFIG>'''
     
     while True:
         try:
@@ -77,8 +77,7 @@ def receive_message(client: socket.socket):
             write_to_file(msg)
             msgs = msg.split(ESCAPE_TOKEN)
             match(msgs[0]):
-                case '<DISCONNECT>':
-                    print('Fim de jogo. Encerrando conexão com o servidor...')
+                case '<CONFIG>':
                     client.close()
                     break
         except:
@@ -89,11 +88,8 @@ def receive_message(client: socket.socket):
 
 
 def send_message(client: socket.socket):
-    # MENSAGENS ENVIADAS AO SERVIDOR COM AS SEGUINTES FLAGS:
-    # <STOP>
-    # <NEXT>
-    # <POINTS>
-    # <NICKNAME>
+    '''Envia mensagens para o servidor. Mensagem enviada é:
+    <STOP>'''
 
     while True:
         try:
@@ -101,30 +97,13 @@ def send_message(client: socket.socket):
                 with (pathlib.Path(TEMP_DIR)/TEMP_FILE_CPPTOPY).open() as file:
                     msg = file.read()
                     client.send(f'{msg}'.encode(FORMAT))
-                    # msgs = msg.split(ESCAPE_TOKEN)
-                    # match(msgs[0]):
-                    #     case '<STOP>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}'.encode(FORMAT))
-                    #     case '<NEXT>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}'.encode(FORMAT))
-                    #     case '<POINTS>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}{get_points()}'.encode(FORMAT))
-                    #     case '<NICKNAME>':
-                    #         client.send(f'{msgs[0]}{ESCAPE_TOKEN}{get_nickname()}'.encode(FORMAT))
                 (pathlib.Path(TEMP_DIR)/TEMP_FILE_CPPTOPY).unlink()
             else:
                 continue
         except:
             client.close()
-            return
+            break
 
 
 if __name__ == '__main__':
     main()
-    
-
-#<NICKNAME>
-#BRUCE_LEE
-
-#<POINTS>
-#125

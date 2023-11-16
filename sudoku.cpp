@@ -233,7 +233,7 @@ bool Game::next(int &x, int &y, int (&M)[9][9])
         {
             return true;
         }
-        if (x == 8 and y == 8)
+        if (x == 8 && y == 8)
             return false;
         if (x == 8)
         {
