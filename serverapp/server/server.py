@@ -78,13 +78,13 @@ def main():
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind(ADDR)
-        accept_clients(server)
+        accept_clients(server, out)
     except KeyboardInterrupt:
         server.close()
     finally:
         server.close()
 
-def accept_clients(server: socket.socket):
+def accept_clients(server: socket.socket, out: str):
     global MAX_NUM_PLAYERS
     server.listen()
     i = 0
@@ -102,6 +102,7 @@ def accept_clients(server: socket.socket):
                 target=hear_client, args=(conn, addr, conns))
             threads.append(thread1)
             thread1.start()
+            config(Flags.CONFIG.value + out, conn)
             time.sleep(0.5)
             i += 1
 
@@ -137,8 +138,8 @@ def stop(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
 def begin(content: str, conns: list[socket.socket]):
     [conn.send(bytes(content, FORMAT)) for conn in conns]
 
-def config(content: str, conns: list[socket.socket]):
-    [conn.send(bytes(content, FORMAT)) for conn in conns]
+def config(content: str, conn: socket.socket):
+    conn.send(bytes(content, FORMAT))
 
 def points(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
     global POINTS, NICKNAMES, ESCAPE_TOKEN

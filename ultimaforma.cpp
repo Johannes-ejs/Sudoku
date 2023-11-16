@@ -48,8 +48,7 @@ class AlgumaCoisa {
         if (inputFile.is_open())
         {
             string line;
-            while (getline(inputFile, line))
-            {
+            while (getline(inputFile, line)){
                 ret.push_back(line);
             }
             inputFile.close();
@@ -112,17 +111,11 @@ class AlgumaCoisa {
     }
 
     string join(string ip, string nickname){
-        return exec(string("python serverapp") + POSIX_CHAR + "client" + POSIX_CHAR + "clientV2.py" + " " + ip + " " + nickname);
+        return exec(string("python serverapp") + POSIX_CHAR + "client" + POSIX_CHAR + "client.py" + " " + ip + " " + nickname);
     }
 
     string create(int max_num){
-        return exec(string("python serverapp") + POSIX_CHAR + "server" + POSIX_CHAR + "serverV2.py" + " " + to_string(max_num));
+        return exec(string("python serverapp") + POSIX_CHAR + "server" + POSIX_CHAR + "server.py" + " " + to_string(max_num));
     }
 
 };
-// start button -> criar msg padronizada -> escrever a msg em '.server/cpp_to_python.txt' == write_file
-
-int main(){
-    AlgumaCoisa a("aaa", "sknfjds");
-    cout << a.get_ip() << endl;
-}
