@@ -7,9 +7,7 @@ import shutil
 import sys
 
 
-SERVER: str = '192.168.0.137'
 PORT: int = 5050
-ADDR: tuple[str, int]= (SERVER, PORT)
 FORMAT = 'utf-8'
 ESCAPE_TOKEN = '\n'
 TEMP_DIR = '.client'
@@ -67,8 +65,9 @@ def main():
 
 
 def receive_message(client: socket.socket):
-    '''MENSAGENS RECEBIDAS PELO SERVIDOR COM AS SEGUINTES FLAGS:
-    <CONFIG>'''
+    '''MENSAGENS RECEBIDAS PELO SERVIDOR COM A SEGUINTE FLAG:
+    <CONFIG>. Esta flag sinaliza a aplicação que a mensagem contém a matriz do quebra-cabeça a ser resolvido
+    e a matriz da solução do quebra-cabeça.'''
     
     while True:
         try:
@@ -89,7 +88,7 @@ def receive_message(client: socket.socket):
 
 def send_message(client: socket.socket):
     '''Envia mensagens para o servidor. Mensagem enviada é:
-    <STOP>'''
+    <STOP>. Esta flag sinaliza ao servidor que o jogo foi finalizado pelo cliente.'''
 
     while True:
         try:
