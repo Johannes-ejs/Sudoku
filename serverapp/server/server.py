@@ -45,6 +45,9 @@ POINTS = []
 
 
 def is_socket_closed(sock):
+    '''
+    Checa se o socket passado está aberto ou não
+    '''
     try:
         error_code = sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
         return False
@@ -86,6 +89,9 @@ def main():
         server.close()
 
 def accept_clients(server: socket.socket, out: str):
+    '''
+        Código responsável por aceitar conexões de clientes no servidor
+    '''
     global MAX_NUM_PLAYERS
     server.listen()
     i = 0
@@ -117,6 +123,9 @@ def accept_clients(server: socket.socket, out: str):
     wait_endgame(threads, conns)
 
 def forced_start(conns):
+    '''
+        Código responsável por verificar se o jogo deve ser iniciado antes do número máximo de jogadores ser alcançado
+    '''
     global TEMP_DIR, CPP_TO_PYTHON
     if not (aux:=pathlib.Path(TEMP_DIR)).exists():
         aux.mkdir()
@@ -125,60 +134,13 @@ def forced_start(conns):
             config(file.read(), conns)
         return True
     
-def broadcast_players(conns: list[socket.socket]):
-    global NICKNAMES, ESCAPE_TOKEN
-    [conn.send(bytes("<LIST>" + ESCAPE_TOKEN, FORMAT)+ bytes(ESCAPE_TOKEN.join(NICKNAMES.values()), FORMAT)) for conn in conns]
-
-def endgame(content: str, conns: list[socket.socket], addr):
-    [conn.send(bytes(content, FORMAT)) for conn in conns]
-
-def stop(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    kill_conns(conns)
-    # endgame(content.replace("STOP", "ENDGAME"), conns, addr)
-
-def begin(content: str, conns: list[socket.socket]):
-    [conn.send(bytes(content, FORMAT)) for conn in conns]
-
 def config(content: str, conn: socket.socket):
     conn.send(bytes(content, FORMAT))
 
-def points(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    global POINTS, NICKNAMES, ESCAPE_TOKEN
-    with threading.Lock() as lock:
-        POINTS.append((content.split(ESCAPE_TOKEN)[1], NICKNAMES.get(addr[0], addr[0])))
-    time.sleep(1)
-    rank(content, conn, addr, conns)
-    
-def next(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    global NEXT_COUNT
-    with threading.Lock() as lock:
-        NEXT_COUNT += 1
-    while NEXT_COUNT != MAX_NUM_PLAYERS:
-        time.sleep(0.1)
-    while True:
-        if (aux :=(pathlib.Path(TEMP_DIR) / CPP_TO_PYTHON)).exists():
-            with aux.open() as file:
-                config(bytes(file.read(), FORMAT), conns)
-            aux.unlink()
-            break
-        time.sleep(0.1)
-
-def rank(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    global POINTS
-    with threading.Lock() as lock:
-        POINTS.sort()
-        POINTS.reverse()
-        conn.send(bytes(Flags.RANK.value, FORMAT) + bytes(ESCAPE_TOKEN, FORMAT) +
-                  bytes(' '.join(' '.join(element) for element in POINTS), FORMAT))
-        POINTS.clear()
-
-def nickname(content: str, conn: socket.socket, addr, conns: list[socket.socket]):
-    global NICKNAMES, ESCAPE_TOKEN
-    with threading.Lock() as lock:
-        NICKNAMES[addr[0]] = content.split(ESCAPE_TOKEN)[1]
-        print(NICKNAMES)
-
 def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
+    '''
+    Código responsável por ouvir as mensagens enviadas pelos clientes e transmitir informação a eles
+    '''
     global ESCAPE_TOKEN, HEADER, FORMAT
     while True:
         try:
@@ -189,21 +151,20 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
         match content.split(ESCAPE_TOKEN)[0]:
             case Flags.NEXT.value:
                 next(content, conn, addr, conns)
-            case Flags.POINTS.value:
-                points(content, conn, addr, conns)
-            case Flags.STOP.value:
-                stop(content, conn, addr, conns)
-            case Flags.NICKNAME.value:
-                nickname(content, conn, addr, conns)
             case _:
                 print(f"Unrecognized flag: {content}")
                 break
 
 def kill_conns(conns: list[socket.socket]):
+    '''
+        Código responsável por fechar as conexões com os clientes
+    '''
     [conn.close() for conn in conns]
-    # [conn.send(bytes(Flags.DISCONNECT.value, FORMAT)) for conn in conns]
 
 def wait_endgame(threads: list[threading.Thread], conns: list[socket.socket]):
+    '''
+        Código responsável por esperar o fim do jogo
+    '''
     global TEMP_DIR
     while True:
         time.sleep(1)
