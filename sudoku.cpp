@@ -247,7 +247,7 @@ bool Game::next(int &x, int &y, int (&M)[9][9])
 
 int main(int argc, char **argv)
 {
-    Game jogo((int)argv[1], 1);
+    Game jogo(argv[1][0] - '0', 1);
     for (int k = 0; k < 2; k++){
         for (int i = 0; i < 9; i++){
             for (int j = 0; j < 9; j++){

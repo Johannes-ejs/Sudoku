@@ -68,12 +68,13 @@ def main():
     args = parse_args()
     MAX_NUM_PLAYERS = args.num_players
     diff = args.difficulty
+    print(f"Difficulty: {diff}")
     subprocess.run("g++ sudoku.cpp -o sudoku", shell=True)
-    out: str
-    try:
-        out = subprocess.run(f".\\sudoku {diff}", shell=True, capture_output=True).stdout.decode("utf-8")
-    except Exception:
-        out = subprocess.run(f"./sudoku {diff}", shell=True, capture_output=True).stdout.decode("utf-8")
+    out = subprocess.run(f".\\sudoku {diff}", shell=True, capture_output=True).stdout.decode(FORMAT)
+    if not out:
+        out = subprocess.run(f"./sudoku {diff}", shell=True, capture_output=True).stdout.decode(FORMAT)
+    print(out)
+   
 
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -102,7 +103,7 @@ def accept_clients(server: socket.socket, out: str):
                 target=hear_client, args=(conn, addr, conns))
             threads.append(thread1)
             thread1.start()
-            config(Flags.CONFIG.value + out, conn)
+            config(Flags.CONFIG.value + ESCAPE_TOKEN + out, conn)
             time.sleep(0.5)
             i += 1
 
@@ -113,7 +114,7 @@ def accept_clients(server: socket.socket, out: str):
     print("All clients connected")
     time.sleep(0.2)
     print("Game started")
-    wait_endgame(threads)
+    wait_endgame(threads, conns)
 
 def forced_start(conns):
     global TEMP_DIR, CPP_TO_PYTHON
@@ -180,7 +181,11 @@ def nickname(content: str, conn: socket.socket, addr, conns: list[socket.socket]
 def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
     global ESCAPE_TOKEN, HEADER, FORMAT
     while True:
-        content = conn.recv(HEADER).decode(FORMAT)
+        try:
+            content = conn.recv(HEADER).decode(FORMAT)
+        except OSError:
+            conn.close()
+            return
         match content.split(ESCAPE_TOKEN)[0]:
             case Flags.NEXT.value:
                 next(content, conn, addr, conns)
