@@ -122,7 +122,5 @@ class AlgumaCoisa {
 
 
 int main(){
-    AlgumaCoisa algumaCoisa("serverapp", "server.txt");
-    algumaCoisa.join("192.168.0.137", "aaaaaa");
-    return 0;
+
 }
