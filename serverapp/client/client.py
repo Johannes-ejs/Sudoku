@@ -33,11 +33,13 @@ def rmdir_client(threads: list):
 
 
 def write_to_file(mensagem: str)->None:
+    '''Função que recebe uma mensagem do servidor e escreve no arquito python_to_cpp.txt'''
     with open(os.path.join(TEMP_DIR, TEMP_FILE_PYTOCPP), 'w') as f:
         f.write(mensagem)
 
 
 def main():
+    '''Função principal que roda na aplicação do lado do cliente.'''
     ip_server = sys.argv[1]
     nickname = sys.argv[2]
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -77,16 +79,16 @@ def receive_message(client: socket.socket):
             match(msgs[0]):
                 case '<CONFIG>':
                     client.close()
-                    return
+                    break
         except:
             print('Não foi possível continuar conectado...')
             input('Pressione <enter> para continuar...')
             client.close()
-            return
+            break
 
 
 def send_message(client: socket.socket):
-    '''MENSAGENS ENVIADAS AO SERVIDOR COM AS SEGUINTES FLAGS:
+    '''Envia mensagens para o servidor. Mensagem enviada é:
     <STOP>'''
 
     while True:
@@ -100,15 +102,8 @@ def send_message(client: socket.socket):
                 continue
         except:
             client.close()
-            return
+            break
 
 
 if __name__ == '__main__':
     main()
-    
-
-#<NICKNAME>
-#BRUCE_LEE
-
-#<POINTS>
-#125

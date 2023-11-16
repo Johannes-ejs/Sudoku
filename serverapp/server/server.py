@@ -197,6 +197,7 @@ def hear_client(conn: socket.socket, addr, conns: list[socket.socket]):
                 nickname(content, conn, addr, conns)
             case _:
                 print(f"Unrecognized flag: {content}")
+                break
 
 def kill_conns(conns: list[socket.socket]):
     [conn.close() for conn in conns]
